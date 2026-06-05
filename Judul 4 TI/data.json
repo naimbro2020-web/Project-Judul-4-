@@ -1,0 +1,9 @@
+{
+    "items": [
+        {"nama": "Atomic Habits", "deskripsi": "Buku tentang kebiasaan kecil", "kategori": "Buku"},
+        {"nama": "Coffe Shop", "deskripsi": "Tempat nongkrong favorit", "kategori": "Tempat"},
+        {"nama": "Avengers Endgame", "deskripsi": "Film superhero terbaik", "kategori": "Film"},
+        {"nama": "Bakso", "deskripsi": "Makanan berkuah dengan pentol", "kategori": "Makanan"},
+        {"nama": "Mobile Legends", "deskripsi": "Game 5v5 seru", "kategori": "Game"}
+    ]
+}

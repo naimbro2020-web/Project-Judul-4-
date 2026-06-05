@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koleksi Favoritku</title>
+    
+    <!-- Menggunakan Tailwind CSS via CDN untuk Layout Modern -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Mengambil Font Elegan dari Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Pengaturan Font & Background Base */
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fafafa;
+            /* Pola titik-titik halus untuk background */
+            background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Layout Grid untuk Rak Buku */
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 2.5rem 2rem;
+            padding: 1rem 0;
+        }
+
+        /* Desain Kartu Buku Elegan */
+        .book-card {
+            background: white;
+            border-radius: 12px 16px 16px 12px;
+            overflow: hidden;
+            box-shadow: 10px 10px 15px -3px rgba(0, 0, 0, 0.1), 4px 4px 6px -2px rgba(0, 0, 0, 0.05), inset 2px 0px 5px rgba(255,255,255,0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            cursor: pointer;
+            border: 1px solid #f3f4f6;
+            border-left: 4px solid #e5e7eb; /* Efek tebal punggung buku */
+        }
+
+        /* Animasi saat Hover */
+        .book-card:hover {
+            transform: translateY(-10px) rotateY(-5deg);
+            box-shadow: 15px 25px 30px -5px rgba(0, 0, 0, 0.15), 5px 15px 15px -5px rgba(0, 0, 0, 0.08);
+            border-left-color: #cbd5e1;
+        }
+
+        /* Kontainer Gambar (Rasio Cover Buku) */
+        .book-cover-container {
+            position: relative;
+            width: 100%;
+            padding-top: 145%; /* Rasio aspek 1:1.45 standar buku */
+            background-color: #f3f4f6;
+            overflow: hidden;
+        }
+
+        .book-cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .book-card:hover .book-cover {
+            transform: scale(1.05); /* Zoom halus pada gambar saat hover */
+        }
+
+        /* Efek Kilau / Punggung Buku pada Gambar */
+        .book-spine-overlay {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 15px;
+            background: linear-gradient(to right, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 100%);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* Cadangan Jika Gambar Lokal Tidak Ditemukan */
+        .no-image-fallback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(135deg, #1e3a8a, #4f46e5); /* Biru Elegan */
+            color: white;
+            font-size: 1.25rem;
+            text-align: center;
+            padding: 1.5rem;
+            position: absolute;
+            top: 0;
+            left: 0;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            box-shadow: inset -5px -5px 20px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen py-16 px-5 sm:px-8 lg:px-12">
+    
+    <!-- Kontainer Utama -->
+    <div class="container mx-auto max-w-7xl">
+        
+        <!-- Header Section -->
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4 relative inline-block">
+                <span class="text-amber-400 mr-2 drop-shadow-md">✨</span>
+                Koleksi Favoritku
+                <span class="text-amber-400 ml-2 drop-shadow-md">✨</span>
+                <!-- Garis Bawah Elegan -->
+                <div class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-indigo-400 to-transparent rounded-full"></div>
+            </h1>
+            <p class="text-gray-500 mt-6 text-lg tracking-wide">Rak buku digital eksklusif Anda.</p>
+            
+            <!-- Tombol Tambah Buku -->
+            <button id="btnTambah" class="mt-8 px-8 py-3 bg-indigo-600 text-white rounded-full font-bold shadow-lg hover:bg-indigo-700 hover:shadow-indigo-500/30 transition transform hover:-translate-y-1">
+                + Tambah Koleksi
+            </button>
+        </header>
+
+        <!-- Container Item/Kartu (Sesuai Referensi HTML Anda) -->
+        <div id="daftar-item" class="card-container">
+            <!-- Kartu Buku akan dimuat oleh JavaScript di bawah ini -->
+        </div>
+        
+    </div>
+
+    <!-- Modal Tambah Buku -->
+    <div id="modalTambah" class="fixed inset-0 bg-black/60 hidden backdrop-blur-sm z-50 flex items-center justify-center transition-opacity">
+        <div class="bg-white rounded-2xl p-6 md:p-8 w-11/12 max-w-md shadow-2xl relative">
+            <button id="btnClose" class="absolute top-4 right-5 text-gray-400 hover:text-gray-800 text-3xl font-light">&times;</button>
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 font-['Playfair_Display']">Tambah Buku Baru</h2>
+            
+            <form id="formTambah" class="flex flex-col gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Judul Buku</label>
+                    <input type="text" id="inputJudul" required class="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Penulis</label>
+                    <input type="text" id="inputPenulis" required class="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tahun Terbit</label>
+                    <input type="number" id="inputTahun" class="w-full border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Upload Cover (Masuk ke Local Storage)</label>
+                    <input type="file" id="inputCover" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition cursor-pointer">
+                    <p class="text-xs text-gray-400 mt-1">*Gambar akan diubah ke Base64</p>
+                </div>
+                
+                <button type="submit" class="mt-4 w-full bg-indigo-600 text-white py-3 rounded-xl font-bold shadow-lg hover:bg-indigo-700 hover:shadow-indigo-500/30 transition transform hover:-translate-y-0.5">
+                    Simpan ke Koleksi
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script Logika Penyimpanan Lokal & Render UI -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('daftar-item');
+
+            // 1. MENGAMBIL DATA DARI LOCAL STORAGE (Sesuai peringatan: jangan dihapus)
+            // Coba ambil data 'koleksiBuku', jika kosong/null kembalikan array kosong []
+            let books = JSON.parse(localStorage.getItem('koleksiBuku')) || [];
+
+            // (Hanya untuk demo preview) - Jika Local Storage benar-benar kosong,
+            // kita suntikkan data dummy ke Local Storage agar ada yang bisa dilihat.
+            if (books.length === 0) {
+                books = [
+                    { id: 1, title: "Laskar Pelangi", author: "Andrea Hirata", image: "img/buku1.jpg", year: 2005 },
+                    { id: 2, title: "Bumi Manusia", author: "Pramoedya Ananta Toer", image: "img/buku2.jpg", year: 1980 },
+                    { id: 3, title: "Filosofi Teras", author: "Henry Manampiring", image: "img/buku3.jpg", year: 2018 },
+                    { id: 4, title: "Cantik Itu Luka", author: "Eka Kurniawan", image: "img/buku4.jpg", year: 2002 },
+                    { id: 5, title: "Laut Bercerita", author: "Leila S. Chudori", image: "img/buku5.jpg", year: 2017 },
+                ];
+                // Simpan ke local storage agar terbaca secara persisten
+                localStorage.setItem('koleksiBuku', JSON.stringify(books));
+            }
+
+            // 2. MERENDER UI (Mengubah CSS & Layout secara dinamis)
+            function renderBooks(bookList) {
+                container.innerHTML = ''; // Bersihkan kontainer
+                
+                bookList.forEach(book => {
+                    const card = document.createElement('div');
+                    card.className = 'book-card group';
+
+                    // Struktur HTML untuk setiap kartu buku.
+                    // Jika `book.image` (gambar lokal) gagal dimuat/tidak ditemukan,
+                    // atribut `onerror` akan menyembunyikan <img> dan memunculkan `.no-image-fallback` 
+                    card.innerHTML = `
+                        <div class="book-cover-container">
+                            <div class="book-spine-overlay"></div>
+                            
+                            <!-- Gambar diambil dari Local -->
+                            <img src="${book.image}" alt="${book.title}" class="book-cover"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                            
+                            <!-- Fallback UI elegan jika gambar lokal belum ada -->
+                            <div class="no-image-fallback" style="display:none;">
+                                <span>${book.title}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="p-5 flex flex-col flex-grow bg-white z-10 relative">
+                            <h3 class="text-xl font-bold text-gray-800 leading-tight mb-2 font-['Playfair_Display'] group-hover:text-indigo-600 transition-colors">
+                                ${book.title}
+                            </h3>
+                            <p class="text-sm font-medium text-gray-500 mb-4">
+                                ${book.author}
+                            </p>
+                            
+                            <div class="mt-auto flex justify-between items-center border-t border-gray-100 pt-3">
+                                <span class="text-xs text-gray-400 font-semibold tracking-wider uppercase">${book.year || '-'}</span>
+                                <span class="inline-flex items-center rounded-md bg-indigo-50 px-2 py-1 text-xs font-semibold text-indigo-700 ring-1 ring-inset ring-indigo-700/10">
+                                    Koleksi
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            // Panggil fungsi render
+            renderBooks(books);
+
+            // 3. LOGIKA TAMBAH BUKU (IMPORT COVER KE LOCAL STORAGE VIA BASE64)
+            const btnTambah = document.getElementById('btnTambah');
+            const modalTambah = document.getElementById('modalTambah');
+            const btnClose = document.getElementById('btnClose');
+            const formTambah = document.getElementById('formTambah');
+
+            // Buka / Tutup Modal
+            btnTambah.addEventListener('click', () => modalTambah.classList.remove('hidden'));
+            btnClose.addEventListener('click', () => modalTambah.classList.add('hidden'));
+            
+            // Tangani Form Submit
+            formTambah.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const judul = document.getElementById('inputJudul').value;
+                const penulis = document.getElementById('inputPenulis').value;
+                const tahun = document.getElementById('inputTahun').value;
+                const fileInput = document.getElementById('inputCover');
+                
+                const newBook = {
+                    id: Date.now(),
+                    title: judul,
+                    author: penulis,
+                    year: tahun,
+                    image: '' // Akan diisi di bawah
+                };
+
+                // Proses baca file gambar dari perangkat
+                if (fileInput.files && fileInput.files[0]) {
+                    const reader = new FileReader();
+                    
+                    // Trigger saat file sukses terbaca
+                    reader.onload = function(event) {
+                        // event.target.result berisi data gambar dalam wujud Base64 String
+                        newBook.image = event.target.result; 
+                        simpanDanRender(newBook);
+                    };
+                    
+                    // Ubah file gambar menjadi String (Data URL)
+                    reader.readAsDataURL(fileInput.files[0]);
+                } else {
+                    simpanDanRender(newBook); // Jika tidak pilih gambar, biarkan kosong
+                }
+            });
+
+            // Fungsi gabungan simpan & render
+            function simpanDanRender(newBook) {
+                books.unshift(newBook); // Masukkan buku baru ke paling depan array
+                localStorage.setItem('koleksiBuku', JSON.stringify(books)); // Simpan ke local storage
+                renderBooks(books); // Render ulang
+                
+                // Bersihkan modal
+                modalTambah.classList.add('hidden');
+                formTambah.reset();
+            }
+        });
+    </script>
+</body>
+</html>
